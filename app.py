@@ -3,10 +3,10 @@ import streamlit as st
 # app.py で Secrets を取得
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 # Cloud ログに出力
-if GEMINI_API_KEY:
-    print("GEMINI_API_KEY length:", len(key))
+if GEMINI_API_KEY is None:
+    print("GEMINI_API_KEY not set")  # Cloud ログ
 else:
-    print("GEMINI_API_KEY not set")
+    print("GEMINI_API_KEY length:", len(GEMINI_API_KEY))  # Cloud ログ
 
 # ページ状態管理
 if "page" not in st.session_state:
