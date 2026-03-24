@@ -4,6 +4,9 @@ from utils.ai_parser import parse_music_input
 def render(GEMINI_API_KEY):
     st.title("🎧 音楽ナビゲーター")
 
+    st.session_state.artist = ""
+    st.session_state.track = ""
+
     text = st.text_input(
         "曲名・アーティスト・URLを入力",
         placeholder="jack harlow whats poppin"
