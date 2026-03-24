@@ -48,6 +48,9 @@ def parse_music_input(user_input: str):
 
     try:
         res = requests.post(url, json=body)
+
+        print("ai parser response:", res)
+        
         res.raise_for_status()
 
         text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
