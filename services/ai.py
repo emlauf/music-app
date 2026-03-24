@@ -3,9 +3,9 @@ import os
 
 import streamlit as st
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 def generate_tags(artist, track):
+
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
     if not GEMINI_API_KEY:
         print("GEMINI_API_KEY not set")
@@ -54,6 +54,9 @@ def generate_diagnosis(tracks):
     return "あなたは“軽さと余裕を好むタイプ”です。"
 
 def generate_reason(base_artist, base_track, target_artist, target_track):
+
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+
     """
     2曲の類似理由を“エモく1文”で生成
     """

@@ -1,9 +1,10 @@
 import os
 import requests
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 def parse_music_input(user_input: str):
+
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+
     """
     ユーザーの曖昧な入力を「アーティスト名」「曲名」に変換
     """
