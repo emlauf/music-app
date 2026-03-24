@@ -15,14 +15,14 @@ def render(api_key):
     )
 
     if st.button("解析する") and text:
-        # ★少し待ってからリクエストすると安定
+        # 解析前に少し待機（安定化）
         time.sleep(0.2)
 
         artist, track, debug_text, debug_error = parse_music_input(text, api_key)
 
         # デバッグ情報をブラウザに表示
         if debug_text:
-            st.text("AI raw response:")
+            st.text("AI raw response / cache:")
             st.text(debug_text)
         if debug_error:
             st.text("AI parser error:")

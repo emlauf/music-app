@@ -5,11 +5,24 @@ import json
 import streamlit as st
 import time
 
-def parse_music_input(user_input: str, GEMINI_API_KEY: str, retries: int = 3, wait_sec: float = 0.5):
+# utils/ai_parser.py
+import requests
+import re
+import json
+import time
+import streamlit as st
+
+def parse_music_input(user_input: str, GEMINI_API_KEY: str, retries: int = 3, base_wait: float = 0.5):
     """
     ユーザーの曖昧な入力を「アーティスト名」「曲名」に変換
-    Cloud安定版（リトライ＆待機対応）
+    Cloud安定版（指数バックオフ + キャッシュ対応）
     """
+
+    # キャッシュチェック
+    cache = st.session_state.get("music_cache", {})
+    if user_input in cache:
+        artist, track = cache[user_input]
+        return artist, track, "Cached response", None
 
     if not GEMINI_API_KEY:
         st.error("GEMINI_API_KEY が設定されていません")
@@ -45,13 +58,15 @@ def parse_music_input(user_input: str, GEMINI_API_KEY: str, retries: int = 3, wa
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
     body = {"contents": [{"parts": [{"text": prompt}]}]}
 
+    wait = base_wait
     for attempt in range(1, retries + 1):
         try:
             res = requests.post(url, json=body)
             
             if res.status_code == 429:
-                print(f"Rate limited (429), retry {attempt}/{retries}")
-                time.sleep(wait_sec)
+                print(f"Rate limited (429), retry {attempt}/{retries}, waiting {wait} sec")
+                time.sleep(wait)
+                wait *= 2  # 指数バックオフ
                 continue
 
             res.raise_for_status()
@@ -69,6 +84,12 @@ def parse_music_input(user_input: str, GEMINI_API_KEY: str, retries: int = 3, wa
                 parsed = json.loads(match.group())
                 artist = parsed.get("artist", "").strip()
                 track = parsed.get("track", "").strip()
+
+                # キャッシュ保存
+                if "music_cache" not in st.session_state:
+                    st.session_state.music_cache = {}
+                st.session_state.music_cache[user_input] = (artist, track)
+
                 return artist, track, text, None
             else:
                 return user_input, "", text, "No JSON found in response"
@@ -84,5 +105,4 @@ def parse_music_input(user_input: str, GEMINI_API_KEY: str, retries: int = 3, wa
             st.text(str(e))
             return user_input, "", None, str(e)
 
-    # すべてのリトライが失敗した場合
     return user_input, "", None, "Failed after retries due to 429"
