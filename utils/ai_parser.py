@@ -51,7 +51,9 @@ def parse_music_input(user_input: str):
         res.raise_for_status()
 
         text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-        print("AI raw response:", text)
+        # ★ ブラウザ上で確認
+        st.text("AI raw response:")
+        st.text(text)
 
         import json
         start = text.find("{")
