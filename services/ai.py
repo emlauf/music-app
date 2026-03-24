@@ -6,6 +6,7 @@ import streamlit as st
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 def generate_tags(artist, track):
+    api_key = os.getenv("GEMINI_API_KEY")
 
     if not GEMINI_API_KEY:
         print("GEMINI_API_KEY not set")
@@ -19,7 +20,7 @@ def generate_tags(artist, track):
 チル / エモい / 夜ドライブ
 """
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
 
     body = {
         "contents": [{"parts": [{"text": prompt}]}]
