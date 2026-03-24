@@ -15,7 +15,7 @@ if "page" not in st.session_state:
 # ルーティング
 if st.session_state.page == "input":
     from pages import input
-    input.render(GEMINI_API_KEY=GEMINI_API_KEY)
+    input.render(api_key=GEMINI_API_KEY)
 
 elif st.session_state.page == "loading":
     from pages import loading
