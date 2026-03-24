@@ -6,8 +6,12 @@ from services.spotify import search_track
 def render():
     st.title("🔍 分析結果")
 
-    artist = "Jack Harlow"
-    track = "WHATS POPPIN"
+    artist = st.session_state.get("artist")
+    track = st.session_state.get("track")
+
+    if not artist or not track:
+        st.warning("先に曲を入力してください")
+        st.stop()
 
     st.subheader(f"{artist} - {track}")
 
@@ -28,7 +32,6 @@ def render():
         if spotify_data:
             st.markdown(f"[▶ 再生]({spotify_data['url']})")
 
-            # 埋め込みプレイヤー（UX爆上がり）
             st.components.v1.iframe(
                 spotify_data["embed"],
                 height=80

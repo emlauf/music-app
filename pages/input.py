@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.ai_parser import parse_music_input
 
 def render():
     st.title("🎧 音楽ナビゲーター")
@@ -9,6 +10,16 @@ def render():
     )
 
     if st.button("解析する"):
-        st.session_state.input_text = text
-        st.session_state.page = "loading"
-        st.rerun()
+        if text:
+            with st.spinner("AIで解析中..."):
+                artist, track = parse_music_input(text)
+
+            if artist and track:
+                # ★ここが重要
+                st.session_state.artist = artist
+                st.session_state.track = track
+
+                st.session_state.page = "loading"
+                st.rerun()
+            else:
+                st.error("曲を特定できませんでした")

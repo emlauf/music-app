@@ -1,0 +1,62 @@
+import os
+import requests
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+def parse_music_input(user_input: str):
+    """
+    ユーザーの曖昧な入力を「アーティスト名」「曲名」に変換
+    """
+
+    prompt = f"""
+    以下の音楽検索入力を解析してください。
+
+    入力: "{user_input}"
+
+    やること:
+    - アーティスト名と曲名を抽出
+    - スペルミスを修正
+    - 正しい英語表記にする
+    - 必ずJSON形式で返す
+
+    出力形式:
+    {{
+      "artist": "...",
+      "track": "..."
+    }}
+
+    例:
+    入力: jack harlo whats poppin
+    出力:
+    {{
+      "artist": "Jack Harlow",
+      "track": "WHATS POPPIN"
+    }}
+    """
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt}
+                ]
+            }
+        ]
+    }
+
+    res = requests.post(url, json=body)
+    res.raise_for_status()
+
+    text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+    # JSON抽出
+    import json
+    try:
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        parsed = json.loads(text[start:end])
+        return parsed["artist"], parsed["track"]
+    except:
+        return None, None
