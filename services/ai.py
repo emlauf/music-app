@@ -7,19 +7,48 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 def generate_tags(artist, track):
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+    if not GEMINI_API_KEY:
+        print("GEMINI_API_KEY not set")
+        return ["chill", "vibes"]
 
     prompt = f"""
-    {artist} - {track} の特徴を
-    日本語の短いタグ3つで出力
-    """
+{artist} - {track} の音楽的特徴を
+3〜5個の短いタグで出力してください。
 
-    body = {"contents":[{"parts":[{"text":prompt}]}]}
+例:
+チル / エモい / 夜ドライブ
+"""
 
-    res = requests.post(url, json=body)
-    text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
 
-    return text.split()
+    body = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+
+    try:
+        res = requests.post(url, json=body)
+
+        # ★ ここ重要（デバッグ用）
+        data = res.json()
+        print("Gemini response:", data)
+
+        res.raise_for_status()
+
+        # ★ 安全に取り出す
+        candidates = data.get("candidates")
+        if not candidates:
+            return ["vibes", "chill"]
+
+        text = candidates[0]["content"]["parts"][0]["text"]
+
+        # タグ整形
+        tags = [t.strip("#・ \n") for t in text.split() if t]
+
+        return tags[:5]
+
+    except Exception as e:
+        print("generate_tags error:", e)
+        return ["vibes", "mood"]
 
 def generate_diagnosis(tracks):
     return "あなたは“軽さと余裕を好むタイプ”です。"
