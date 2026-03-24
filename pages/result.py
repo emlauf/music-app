@@ -1,7 +1,9 @@
 import streamlit as st
 from services.lastfm import get_similar_tracks
-from services.ai import generate_tags
 from services.spotify import search_track
+from services.ai import generate_tags
+from services.ai import generate_reason
+from services.ai import cached_generate_reason
 
 def render():
     st.title("🔍 分析結果")
@@ -17,7 +19,9 @@ def render():
 
     # タグ
     tags = generate_tags(artist, track)
-    st.write(" ".join([f"#{t}" for t in tags]))
+    st.write(" ".join([f"#{t.strip('#* ')}" for t in tags]))
+
+    st.subheader("🎧 あなたに刺さる可能性が高い順")
 
     tracks = get_similar_tracks(artist, track)
 
@@ -25,7 +29,13 @@ def render():
 
     for i, t in enumerate(tracks):
         st.write(f"### {t['artist']} - {t['track']}")
-        st.write("→ 余裕あるラップ感")
+        reason = cached_generate_reason(
+            artist,
+            track,
+            t["artist"],
+            t["track"]
+        )
+        st.write(f"→ {reason}")
 
         spotify_data = search_track(t["artist"], t["track"])
 
