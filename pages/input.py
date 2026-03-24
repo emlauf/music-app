@@ -13,6 +13,7 @@ def render():
         if text:
             with st.spinner("AIで解析中..."):
                 artist, track = parse_music_input(text)
+                st.write("Debug:", artist, track)
 
             if artist and track:
                 # ★ここが重要
