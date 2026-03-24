@@ -4,7 +4,6 @@ import streamlit as st
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     print("GEMINI_API_KEY not set")
-    return ["chill", "vibes"]
 
 # ページ状態管理
 if "page" not in st.session_state:
