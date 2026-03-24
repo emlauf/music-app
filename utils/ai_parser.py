@@ -46,17 +46,21 @@ def parse_music_input(user_input: str):
         ]
     }
 
-    res = requests.post(url, json=body)
-    res.raise_for_status()
-
-    text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-
-    # JSON抽出
-    import json
     try:
+        res = requests.post(url, json=body)
+        res.raise_for_status()
+
+        text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+        import json
         start = text.find("{")
         end = text.rfind("}") + 1
         parsed = json.loads(text[start:end])
+
         return parsed["artist"], parsed["track"]
-    except:
-        return None, None
+
+    except Exception as e:
+        print("AI parser error:", e)
+
+        # ★ フォールバック（ここ超重要）
+        return user_input, ""
