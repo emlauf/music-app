@@ -52,9 +52,6 @@ def parse_music_input(user_input: str):
 
         text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
 
-        # デバッグ用に session_state に格納
-        st.session_state["debug_text"] = text
-
         import json
         start = text.find("{")
         end = text.rfind("}") + 1
@@ -64,7 +61,6 @@ def parse_music_input(user_input: str):
 
     except Exception as e:
         print("AI parser error:", e)
-        st.session_state["debug_error"] = str(e)
 
         # ★ フォールバック（ここ超重要）
         return user_input, ""
